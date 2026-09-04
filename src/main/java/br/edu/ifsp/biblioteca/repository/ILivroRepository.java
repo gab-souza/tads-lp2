@@ -3,7 +3,7 @@ import br.edu.ifsp.biblioteca.domain.Livro;
 import java.util.List;
 import java.util.Optional;
 
-public interface ILivroRespository {
+public interface ILivroRepository {
     Livro salvar(Livro novo);
     List<Livro> listarTodos();
     Optional<Livro> buscarPorId(Long id);

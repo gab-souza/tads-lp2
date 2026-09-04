@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.*;
 
-public class LivroRepositoryEmMemoria implements ILivroRespository {
+public class LivroRepositoryEmMemoria implements ILivroRepository {
 
     private final Map<Long, Livro> livros = new HashMap<>();
     private Long sequenciaId = 0L;

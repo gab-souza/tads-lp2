@@ -6,11 +6,10 @@ public class Exemplar {
     private Livro livro;
     private EStatusExemplar status;
 
-    public Exemplar(Long id, String cod, Livro livro, EStatusExemplar status){
-        this.id = id;
+    public Exemplar(String cod, Livro livro){
         this.cod = cod;
         this.livro = livro;
-        this.status = status;
+        this.status = EStatusExemplar.DISPONIVEL;
     }
 
     public Long getId() {

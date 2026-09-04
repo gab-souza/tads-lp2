@@ -14,7 +14,7 @@ public class Usuario {
         return this.id;
     }
 
-    public void setId(){
+    public void setId(Long aLong){
         this.id = id;
     }
 
