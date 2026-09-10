@@ -4,18 +4,9 @@ public class Usuario {
     private Long id;
     private String nome, email;
 
-    public Usuario(Long id, String nome, String email){
-        this.id = id;
+    public Usuario(String nome, String email){
         this.nome= nome;
         this.email = email;
-    }
-
-    public Long getId(){
-        return this.id;
-    }
-
-    public void setId(Long aLong){
-        this.id = id;
     }
 
     public String getNome(){
@@ -37,9 +28,16 @@ public class Usuario {
     @Override
     public String toString() {
         return "Usuario{" +
-                "id=" + id +
                 ", nome='" + nome + '\'' +
                 ", email='" + email + '\'' +
                 '}';
+    }
+
+    public Long getId() {
+        return this.id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 }

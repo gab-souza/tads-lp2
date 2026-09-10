@@ -9,15 +9,15 @@ public class UsuarioRepositoryEmMemoria implements IUsuarioRepository {
     private final Map<Long, Usuario> usuarios = new HashMap<>();
     private Long sequenciaId = 0L;
 
-    @Override
-    public Usuario salvar(Usuario u) {
-        if(u.getId() == null) {
-            u.setId(++this.sequenciaId);
-        }
-
-        this.usuarios.put(u.getId(), u);
-        return u;
+@Override
+public Usuario salvar(Usuario u) {
+    if(u.getId() == null) {
+        u.setId(++this.sequenciaId);
     }
+
+    this.usuarios.put(u.getId(), u);
+    return u;
+}
 
     @Override
     public Optional<Usuario> buscarPorId(Long id) {
