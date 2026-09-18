@@ -3,6 +3,8 @@ import br.edu.ifsp.biblioteca.cli.CatalogoRunner;
 import br.edu.ifsp.biblioteca.domain.Livro;
 import br.edu.ifsp.biblioteca.repository.ILivroRepository;
 import br.edu.ifsp.biblioteca.repository.LivroRepositoryEmMemoria;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import java.util.List;
 import java.util.Optional;
@@ -17,10 +19,12 @@ import java.util.Optional;
  *                          pacote para baixo — por isso todo o codigo
  *                          fica sob br.edu.ifsp.biblioteca)
  */
+
+@SpringBootApplication
 public class BibliotecaApplication {
 
     public static void main(String[] args) {
-        CatalogoRunner appExecutor = new CatalogoRunner();
-        appExecutor.run();
+        SpringApplication.run(BibliotecaApplication.class, args);
     }
+
 }
