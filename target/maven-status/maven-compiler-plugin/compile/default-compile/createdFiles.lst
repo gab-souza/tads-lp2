@@ -1,5 +1,6 @@
 br/edu/ifsp/biblioteca/cli/CatalogoRunner.class
 br/edu/ifsp/biblioteca/repository/UsuarioRepositoryEmMemoria.class
+br/edu/ifsp/biblioteca/repository/LivroRepositoryJdbc.class
 br/edu/ifsp/biblioteca/repository/LivroRepositoryEmMemoria.class
 br/edu/ifsp/biblioteca/service/UsuarioService.class
 br/edu/ifsp/biblioteca/repository/ILivroRepository.class
