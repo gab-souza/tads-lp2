@@ -29,13 +29,19 @@ public class LivroRepositoryJdbc implements ILivroRepository {
         try (Connection conexao = this.dataSource.getConnection()) {
             conexao.setAutoCommit(false);
 
-            if (novo.getId() == null) {
-                this.inserirLivro(conexao, novo);
-            } else {
-                this.atualizarLivro(conexao, novo);
+            try{
+                if (novo.getId() == null) {
+                    this.inserirLivro(conexao, novo);
+                } else {
+                    this.atualizarLivro(conexao, novo);
+                }
+                this.salvarAutores(conexao, novo);
+                this.salvarExemplares(conexao, novo);
+                conexao.commit();
+            } catch (SQLException erro){
+                conexao.rollback();
+                throw erro;
             }
-            this.salvarAutores(conexao, novo);
-            this.salvarExemplares(conexao, novo);
         } catch (SQLException erro) {
             throw new IllegalStateException("Falha ao salvar o livro", erro);
         }
