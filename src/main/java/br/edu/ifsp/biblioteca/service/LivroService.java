@@ -3,70 +3,84 @@ package br.edu.ifsp.biblioteca.service;
 import br.edu.ifsp.biblioteca.domain.Autor;
 import br.edu.ifsp.biblioteca.domain.Exemplar;
 import br.edu.ifsp.biblioteca.domain.Livro;
+import br.edu.ifsp.biblioteca.dto.LivroDetalhe;
+import br.edu.ifsp.biblioteca.dto.NovoLivro;
 import br.edu.ifsp.biblioteca.exception.RegraDeNegocioException;
 import br.edu.ifsp.biblioteca.repository.ILivroRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
-@Service
 
+@Service
 public class LivroService {
 
-    private final ILivroRepository livroRepository;
+    private ILivroRepository livroRepository;
+    @Transactional
 
-    public LivroService(ILivroRepository rep){
-        this.livroRepository = rep;
-    }
 
-    public Livro cadastrar(Livro livro){
-        if(livro.getTitulo() == null || livro.getTitulo().isEmpty()){
-            throw new RegraDeNegocioException("O título é obrigatório!");
-        }
-        if(livro.getIsbn() == null || livro.getIsbn().isEmpty()){
-            throw new RegraDeNegocioException("ISBN é obrigatório!");
-        }
-        if(livro.getAnoPublicacao() <= 0){
-            throw new RegraDeNegocioException("O ano de publicação deve ser maior que zero!");
-        }
-        Optional<Livro> livroJaCadastradoOptional = this.livroRepository.buscarPorIsbn(livro.getIsbn());
+    public Livro cadastrar(Livro livro) {
 
-        if(livroJaCadastradoOptional.isPresent()){
-            throw new RegraDeNegocioException("Já existe um livro cadastrado com o ISBN: " + livro.getIsbn());
+        Livro livro = novoLivro.toEntity();
+        if (livro.getTitulo() == null || livro.getTitulo().isEmpty()) {
+            throw new RegraDeNegocioException("O Título é Obrigatório!");
         }
 
-        Livro livroCadastrado = this.livroRepository.salvar(livro);
-        return livroCadastrado;
-    }
-
-    public Livro adicionarExemplar(Long livroId, String codExemplar){
-            Livro livro = this.buscarPorId(livroId);
-            livro.adicionarExemplar(new Exemplar(codExemplar, livro));
-            return this.livroRepository.salvar(livro);
-
-    }
-
-    public Livro addAutor(Long livroId, String nomeAutor){
-        Livro livroEncontrado = this.buscarPorId(livroId);
-        livroEncontrado.addAutor(new Autor(nomeAutor));
-        return this.livroRepository.salvar(livroEncontrado);
-
-    }
-
-    public Livro buscarPorId(Long id){
-        Optional<Livro> livroOptional = this.livroRepository.buscarPorId(id);
-        if (livroOptional.isPresent()){
-            return livroOptional.get();
+        if (livro.getIsbn() == null || livro.getIsbn().isEmpty()) {
+            throw new RegraDeNegocioException("ISBN é Obrigatório!");
         }
-        throw new RegraDeNegocioException("Livro não encontrado:" + id);
+
+        if (livro.getAnoPublicacao() <= 0) {
+            throw new RegraDeNegocioException("O Ano de Publicação deve ser maior que 0");
+        }
+
+        Optional<Livro> livroJaCadastradoOptional = this.livroRepository
+            .findByIsbn(livro.getIsbn());
+
+        if (livroJaCadastradoOptional.isPresent()) {
+            throw new RegraDeNegocioException(
+                "Já existe um livro cadastrado com o ISBN: " + livro.getIsbn()
+            );
+        }
+
+        Livro livroCadastrado = this.livroRepository.save(livro);
+
+        return LivroDetalhe.of(livroCadastrado);
     }
 
-    public List<Livro> buscarPorTitulo(String trechoTitulo) {
-        return this.livroRepository.buscarPorTitulo(trechoTitulo);
+    public LivroDetalhe adicionarExemplar(Long livroId, String codigoDoExemplar) {
+
+        Livro livro = this.livroRepository.findById(livroId).orElseThrow(() -> new RegraDeNegocioException("Livro não encontrado " + livroId));
+        livro.adicionarExemplar(new Exemplar(codigoDoExemplar, livro));
+
+        return LivroDetalhe.of(this.livroRepository.save(livro));
     }
 
-    public List<Livro> listarTodos(){
-        return this.livroRepository.listarTodos();
+    public LivroDetalhe adicionarAutor(Long livroId, String nomeAutor) {
+
+        Livro livroEncontrado = this.livroRepository.findById(livroId).orElseThrow(() -> new RegraDeNegocioException("Livro não encontrado " + livroId));
+        livroEncontrado.adicionarAutor(new Autor(nomeAutor));
+
+        return LivroDetalhe.of(this.livroRepository.save(livroEncontrado));
     }
 
+    public LivroDetalhe buscarPorId(Long id) {
+
+        Optional<Livro> livroOptional = this.livroRepository.findById(id);
+
+        if (livroOptional.isPresent()) {
+            return LivroDetalhe.of(livroOptional.get());
+        }
+
+        throw new RegraDeNegocioException("Livro não encontrado: " + id);
+    }
+
+    public List<LivroDetalhe> buscarPorTitulo(String trechoDoTitulo) {
+        return this.livroRepository.findByTituloContainingIgnoreCase(trechoDoTitulo).stream().map(LivroDetalhe::of).toList();
+    }
+
+    public List<LivroDetalhe> listarTodos() {
+        return this.livroRepository.findAll().stream().map(LivroDetalhe::of).toList();
+    }
 }

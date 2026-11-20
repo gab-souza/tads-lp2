@@ -1,25 +1,57 @@
 package br.edu.ifsp.biblioteca.domain;
 
+import jakarta.persistence.*;
+
 import java.util.ArrayList;
 import java.util.List;
 
+@Entity
+@Table(name = "livro")
 public class Livro {
-    private Long id;
-    private String isbn, titulo;
-    private int anoPublicacao;
-    private List<Exemplar> listaExemplares;
-    private List<Autor> autores;
 
-    public Livro(String isbn, String titulo, int anoPublicacao){
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(nullable = false, unique = true, length = 20)
+    private String isbn;
+
+    @Column(nullable = false, length = 200)
+    private String titulo;
+
+    @Column(name = "ano_publicacao")
+    private Integer anoPublicacao;
+
+    @OneToMany(
+        mappedBy = "livro",
+        cascade = CascadeType.ALL,
+        orphanRemoval = true,
+        fetch = FetchType.LAZY
+    )
+    private List<Exemplar> listaDeExemplares = new ArrayList<>();
+
+    // ORM = Object Relational Mapping
+
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinTable(
+        name = "livro_autor",
+        joinColumns = @JoinColumn(name = "livro_id"),
+        inverseJoinColumns = @JoinColumn(name = "autor_id")
+    )
+    private List<Autor> autores = new ArrayList<>();
+
+    public Livro() {}
+
+    public Livro(String isbn, String titulo, Integer anoPublicacao) {
         this.isbn = isbn;
         this.titulo = titulo;
         this.anoPublicacao = anoPublicacao;
-        this.listaExemplares = new ArrayList<>();
-        this.autores= new ArrayList<>();
+        this.listaDeExemplares = new ArrayList<>();
+        this.autores = new ArrayList<>();
     }
 
     public Long getId() {
-        return this.id;
+        return id;
     }
 
     public void setId(Long id) {
@@ -27,7 +59,7 @@ public class Livro {
     }
 
     public String getIsbn() {
-        return this.isbn;
+        return isbn;
     }
 
     public void setIsbn(String isbn) {
@@ -35,37 +67,47 @@ public class Livro {
     }
 
     public String getTitulo() {
-        return this.titulo;
+        return titulo;
     }
 
     public void setTitulo(String titulo) {
         this.titulo = titulo;
     }
 
-    public int getAnoPublicacao() {
-        return this.anoPublicacao;
+    public Integer getAnoPublicacao() {
+        return anoPublicacao;
     }
 
-    public void setAnoPublicacao(int anoPublicacao) {
+    public void setAnoPublicacao(Integer anoPublicacao) {
         this.anoPublicacao = anoPublicacao;
     }
 
-    public void adicionarExemplar(Exemplar ex){
-        this.listaExemplares.add(ex);
+    public void adicionarExemplar(Exemplar item) {
+        this.listaDeExemplares.add(item);
     }
 
-    public void addAutor(Autor autor){
+    public void adicionarAutor(Autor autor) {
         this.autores.add(autor);
     }
 
-    public List<Autor> getAutores(){
+    public List<Autor> getAutores() {
         return this.autores;
     }
 
-    public List<Exemplar> getListaExemplares(){
-        return this.listaExemplares;
+    public List<Exemplar> getExemplares() {
+        return this.listaDeExemplares;
     }
 
+    public long quantidadeDisponivel(){
+        long disponiveis = 0;
+
+        for(Exemplar exemplar : this.getExemplares()){
+            if(exemplar.estaDisponivel()){
+                disponiveis+=1;
+            }
+        }
+        return disponiveis;
+    }
 
     @Override
     public String toString() {

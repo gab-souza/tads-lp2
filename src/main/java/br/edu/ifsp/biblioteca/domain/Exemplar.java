@@ -1,13 +1,30 @@
 package br.edu.ifsp.biblioteca.domain;
 
+import jakarta.persistence.*;
+
+@Entity
+@Table(name = "exemplar")
 public class Exemplar {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String cod;
-    private Livro livro;
+
+    @Column(nullable = false, unique = true, length = 30)
+    private String codigo;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
     private EStatusExemplar status;
 
-    public Exemplar(String cod, Livro livro){
-        this.cod = cod;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "livro_id", nullable = false)
+    private Livro livro;
+
+    protected Exemplar() {}
+
+    public Exemplar(String codigo, Livro livro) {
+        this.codigo = codigo;
         this.livro = livro;
         this.status = EStatusExemplar.DISPONIVEL;
     }
@@ -20,20 +37,12 @@ public class Exemplar {
         this.id = id;
     }
 
-    public String getCod() {
-        return cod;
+    public String getCodigo() {
+        return codigo;
     }
 
-    public void setCod(String cod) {
-        this.cod = cod;
-    }
-
-    public Livro getLivro() {
-        return livro;
-    }
-
-    public void setLivro(Livro livro) {
-        this.livro = livro;
+    public void setCodigo(String codigo) {
+        this.codigo = codigo;
     }
 
     public EStatusExemplar getStatus() {
@@ -44,27 +53,37 @@ public class Exemplar {
         this.status = status;
     }
 
-    public void emprestar(){
-        if(this.status == EStatusExemplar.EMPRESTADO){
-            throw new IllegalStateException("Exemplar " + this.cod + " já está emprestado");
+    public Livro getLivro() {
+        return livro;
+    }
+
+    public void setLivro(Livro livro) {
+        this.livro = livro;
+    }
+
+    public void emprestar() {
+
+        if (this.status == EStatusExemplar.EMPRESTADO) {
+            throw new IllegalStateException(
+                    "Exemplar " + this.codigo + " já está emprestado!!!"
+            );
         }
+
         this.status = EStatusExemplar.EMPRESTADO;
     }
 
-    public void devolver(){
+    public void devolver() {
         this.status = EStatusExemplar.DISPONIVEL;
     }
 
-    public boolean estaDisponivel(){
+    public boolean estaDisponivel() {
         return this.status == EStatusExemplar.DISPONIVEL;
     }
 
     @Override
     public String toString() {
         return "Exemplar{" +
-                "id=" + id +
-                ", cod='" + cod + '\'' +
-                ", livro=" + livro +
+                "codigo='" + codigo + '\'' +
                 ", status=" + status +
                 '}';
     }
